@@ -9,7 +9,7 @@ Include in `:deps` section with the `SHA` of the commit you want
 ```clojure
 {
  :deps {
-          com.cleancoders.speclj-junit-xml  {:git/url "https://github.com/cleancoders/speclj-junit-xml" :git/sha "[latest-commit-sha]"}
+          com.cleancoders.speclj-junit-xml/speclj-junit-xml  {:git/url "https://github.com/cleancoders/speclj-junit-xml" :git/sha "[latest-commit-sha]"}
         }
  }
 ```
