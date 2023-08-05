@@ -1,0 +1,16 @@
+{
+ :paths     ["src/clj" "src/cljc" "resources"]
+ :deps      {
+             org.clojure/clojure  {:mvn/version "1.11.1"}
+             org.clojure/data.xml {:mvn/version "0.0.8"}
+             com.cleancoders.c3kit/apron {:git/url "https://github.com/cleancoders/c3kit-apron.git" :git/sha "e0057d079d4d7b8f3e061d8be2f28c6379036cdd"}
+             }
+ :aliases   {
+             :test     {:extra-deps  {speclj/speclj                  {:mvn/version "3.4.3"}
+                                      ;org.clojure/clojurescript      {:mvn/version "1.11.60"}
+                                      }
+                        :extra-paths ["src/cljs" "spec/clj" "spec/cljc" "spec/cljs"]}
+             ;:cljs     {:main-opts ["-m" "c3kit.scaffold.cljs"]}
+             :spec     {:main-opts ["-m" "speclj.main" "-c"]}
+             }
+ }
