@@ -33,6 +33,7 @@
     (swap! results update-in [(result-root (result-parent result))] conj result))
 
   (report-runs [_ _]
+    (flush)
     (result-xml)))
 
 (defn new-junit-xml-reporter-reporter []
