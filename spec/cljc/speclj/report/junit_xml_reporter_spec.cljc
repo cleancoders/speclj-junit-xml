@@ -47,7 +47,6 @@
 
     (it "passing test"
       (report-pass @reporter pass1)
-      (println @sut/results)
       (should-contain pass1 (get @sut/results desc)))
 
     (it "failing test"

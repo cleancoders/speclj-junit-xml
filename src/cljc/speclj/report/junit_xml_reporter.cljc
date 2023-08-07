@@ -1,23 +1,25 @@
 (ns speclj.report.junit-xml-reporter
   (:require [clojure.data.xml :as xml]
-            [speclj.report.documentation :refer [level-of]]
-            [speclj-junit-xml.node :as node]))
+            [speclj-junit-xml.node :as node]
+            [speclj.report.documentation :refer [level-of]]))
 
 (def results (atom {}))
 
 (defn result-parent [result]
   (-> result .-characteristic .-parent deref))
+
 (defn result-root [result]
   (loop [result result]
     (if (zero? (level-of result))
       result
       (recur (-> result .-parent deref)))))
+
 (defn result-xml []
   (-> @results
-    node/test-suites
-    xml/sexp-as-element
-    xml/emit-str
-    println))
+      node/test-suites
+      xml/sexp-as-element
+      xml/emit-str
+      println))
 
 (deftype JunitXmlReporter []
   speclj.reporting/Reporter
@@ -34,7 +36,12 @@
 
   (report-runs [_ _]
     (flush)
-    (result-xml)))
+    (result-xml))
+
+  (report-message [reporter message])                       ;; noop
+  (report-pending [this result])                            ;; noop
+  (report-error [this exception])                           ;; noop
+  )
 
 (defn new-junit-xml-reporter-reporter []
   (JunitXmlReporter.))
