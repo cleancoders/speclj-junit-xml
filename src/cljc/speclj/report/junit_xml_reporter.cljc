@@ -1,7 +1,17 @@
 (ns speclj.report.junit-xml-reporter
   (:require [clojure.data.xml :as xml]
+            [clojure.string :as s]
             [speclj-junit-xml.node :as node]
             [speclj.report.documentation :refer [level-of]]))
+
+(defn -env [key] #?(:clj (System/getenv key)))
+
+(defn report-filename []
+  (let [report-path (-env "SPECLJ_REPORT_PATH")
+        report-name (-env "SPECLJ_REPORT_NAME")
+        report-path (if (s/blank? report-path) "speclj" report-path)
+        report-name (if (s/blank? report-name) "speclj.xml" report-name)]
+    (str report-path "/" report-name)))
 
 (def results (atom {}))
 
@@ -15,11 +25,11 @@
       (recur (-> result .-parent deref)))))
 
 (defn result-xml []
-  (-> @results
+  (->> @results
       node/test-suites
       xml/sexp-as-element
       xml/emit-str
-      println))
+      (spit (report-filename))))
 
 (deftype JunitXmlReporter []
   speclj.reporting/Reporter
