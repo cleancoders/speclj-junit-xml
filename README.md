@@ -33,3 +33,18 @@ This will send the resultant XML to stdout:
     </testsuite>
 </testsuites>
 ```
+
+# Deployment
+
+In order to deploy to cleancoders you must be a member of the Clojars group `com.cleancoders`.
+
+1. Go to https://clojars.org/tokens and configure a token with the appropriate scope
+2. Set the following environment variables
+
+```
+CLOJARS_USERNAME=<your username>
+CLOJARS_PASSWORD=<your deploy key>
+```
+
+3. Update VERSION file
+4. `clj -T:build deploy`

@@ -4,12 +4,11 @@
   (:require [clojure.data.xml :as xml]
             [speclj-junit-xml.node :as node]
             [speclj.core #?(:clj :refer :cljc :refer-macros)
-             [describe it should= before -new-failure context
-              stub with-stubs should-have-invoked]]
+             [describe it should= before -new-failure -new-exception]]
             [speclj.report.junit-xml-reporter :as sut]
             [speclj.reporting :refer [report-description report-pass report-fail]]
             [speclj.components :refer [new-description new-characteristic install]]
-            [speclj.results :refer [pass-result fail-result]]))
+            [speclj.results :refer [pass-result fail-result error-result]]))
 
 (def desc (new-description "desc 1" false "ns.1"))
 (def desc3 (new-description "desc 2" false "ns.2"))
@@ -32,6 +31,7 @@
 (def fail2 (fail-result (failing-characteristic desc) 2 (-new-failure "FAIL")))
 (def fail-nested (fail-result (failing-characteristic nested-desc) 3 (-new-failure "FAIL")))
 (def fail-nested-2 (fail-result (failing-characteristic nested-2-desc) 4 (-new-failure "FAIL")))
+(def error (error-result (-new-exception "ERROR MESSAGE")))
 
 (describe "Speclj Junit XML Reporter"
   (with reporter (sut/new-junit-xml-reporter-reporter))
@@ -39,8 +39,6 @@
     (reset! node/characteristic-id 0))
 
   (describe "reports"
-    (with-stubs)
-
     (it "only first level description"
       (report-description @reporter desc)
       (report-description @reporter nested-desc)
@@ -50,6 +48,7 @@
 
     (it "passing test"
       (report-pass @reporter pass1)
+      (println @sut/results)
       (should-contain pass1 (get @sut/results desc)))
 
     (it "failing test"
@@ -57,36 +56,14 @@
       (should-contain fail1 (get @sut/results desc)))
 
     (it "runs"
-      (with-redefs [spit (stub :spit)]
+      (report-pass @reporter pass1)
+      (report-fail @reporter fail1)
+      (let [expected (-> @sut/results node/test-suites xml/sexp-as-element
+                       xml/emit-str println with-out-str)]
+        (reset! sut/results {})
+        (reset! node/characteristic-id 0)
         (report-pass @reporter pass1)
         (report-fail @reporter fail1)
-        (let [expected (-> @sut/results node/test-suites xml/sexp-as-element
-                           xml/emit-str print with-out-str)]
-          (reset! sut/results {})
-          (reset! node/characteristic-id 0)
-          (report-pass @reporter pass1)
-          (report-fail @reporter fail1)
-          (sut/result-xml)
 
-          (should-have-invoked :spit {:with ["speclj/speclj.xml" expected]})))))
-
-  (context "report-filename"
-    (it "default"
-      (should= "speclj/speclj.xml" (sut/report-filename)))
-
-    (it "form env"
-      (with-redefs [sut/-env (fn [key] (get {"SPECLJ_REPORT_PATH" "foo"
-                                             "SPECLJ_REPORT_NAME" "bar.xml"} key))]
-        (should= "foo/bar.xml" (sut/report-filename))))
-
-    (it "path from env"
-      (with-redefs [sut/-env (fn [key] (get {"SPECLJ_REPORT_PATH" "foo"} key))]
-        (should= "foo/speclj.xml" (sut/report-filename))))
-
-    (it "name from env"
-      (with-redefs [sut/-env (fn [key] (get {"SPECLJ_REPORT_NAME" "bar.xml"} key))]
-        (should= "speclj/bar.xml" (sut/report-filename))))
-    )
-
-
-  )
+        (should= expected
+          (with-out-str (sut/result-xml)))))))

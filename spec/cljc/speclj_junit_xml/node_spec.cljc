@@ -69,6 +69,9 @@
         (should-have-invoked :stack-trace {:times 1})
         (should-have-invoked :failure-src {:times 1})))
 
+    (describe "error result"
+      )
+
     (describe "test suite"
       (redefs-around [stack-trace-str (stub :stack-trace)
                       failure-source (stub :failure-src)])
