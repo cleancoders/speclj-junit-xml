@@ -26,10 +26,10 @@
 
 (defn result-xml []
   (->> @results
-      node/test-suites
-      xml/sexp-as-element
-      xml/emit-str
-      (spit (report-filename))))
+    node/test-suites
+    xml/sexp-as-element
+    xml/emit-str
+    (spit (report-filename))))
 
 (deftype JunitXmlReporter []
   speclj.reporting/Reporter
